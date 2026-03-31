@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pages/login_page.dart';
+import 'pages/Teacher/teacher_page.dart';
 
 void main() {
   runApp(const QuranApp());
@@ -13,7 +13,7 @@ class QuranApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Quran App',
-      home: const LoginPage(),
+      home: TeacherDashboard(),
     );
   }
 }
