@@ -13,7 +13,7 @@ class QuranApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Quran App',
-      home: TeacherDashboard(),
+      home: TeacherDashboard(teacherName: 'عبد الرحمان'),
     );
   }
 }
