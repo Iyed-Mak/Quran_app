@@ -12,30 +12,12 @@ class _StudentDataScreenState extends State<StudentDataScreen> {
   final TextEditingController searchController = TextEditingController();
 
   final List<Map<String, String>> students = [
-    {
-      "name": "أحمد محمد",
-      "age": "12",
-      "level": "الجزء 30",
-      "phone": "0551234567",
-    },
-    {
-      "name": "ليلى أحمد",
-      "age": "10",
-      "level": "الجزء 29",
-      "phone": "0559876543",
-    },
-    {
-      "name": "يوسف خالد",
-      "age": "14",
-      "level": "الجزء 28",
-      "phone": "0554567890",
-    },
-    {
-      "name": "سارة محمود",
-      "age": "11",
-      "level": "الجزء 27",
-      "phone": "0554567891",
-    },
+    {"name": "أحمد", "age": "12", "level": "50", "phone": "0551234567"},
+    {"name": "محمد", "age": "13", "level": "29", "phone": "0559876543"},
+    {"name": "ليلى", "age": "10", "level": "60", "phone": "0554567890"},
+    {"name": "فاطمة", "age": "11", "level": "27", "phone": "0554567891"},
+    {"name": "أيمن", "age": "14", "level": "26", "phone": "0554567892"},
+    {"name": "جمال", "age": "15", "level": "25", "phone": "0554567893"},
   ];
 
   List<Map<String, String>> filteredStudents = [];
@@ -122,7 +104,7 @@ class _StudentDataScreenState extends State<StudentDataScreen> {
                   children: [
                     _buildInfoChip("العمر ${student["age"]}"),
                     const SizedBox(width: 8),
-                    _buildInfoChip(student["level"]!),
+                    _buildInfoChip("الحزب ${student["level"]}"),
                   ],
                 ),
                 const SizedBox(height: 10),

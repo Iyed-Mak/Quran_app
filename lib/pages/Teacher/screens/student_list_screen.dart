@@ -4,10 +4,11 @@ class StudentListScreen extends StatefulWidget {
   const StudentListScreen({super.key});
 
   @override
-  _AttendanceEntryScreenState createState() => _AttendanceEntryScreenState();
+  // ignore: library_private_types_in_public_api
+  _StudentListScreenState createState() => _StudentListScreenState();
 }
 
-class _AttendanceEntryScreenState extends State<StudentListScreen>
+class _StudentListScreenState extends State<StudentListScreen>
     with SingleTickerProviderStateMixin {
   final Map<String, bool> students = {
     'عافري أحمد': false,
@@ -101,7 +102,7 @@ class _AttendanceEntryScreenState extends State<StudentListScreen>
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.3),
+                              color: Colors.grey.withValues(alpha: 0.3),
                               blurRadius: 8,
                               offset: Offset(0, 4),
                             ),
@@ -128,7 +129,7 @@ class _AttendanceEntryScreenState extends State<StudentListScreen>
                           ),
                           trailing: Switch(
                             value: isPresent,
-                            activeColor: Colors.green[700],
+                            activeThumbColor: Colors.green[700],
                             onChanged: (val) {
                               setState(() {
                                 students[name] = val;
