@@ -20,6 +20,7 @@ class _MonthlySummaryScreenState extends State<MonthlySummaryScreen> {
   ];
 
   final TextEditingController reportController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   double get averageScore {
     double total = students.fold(0, (sum, item) => sum + item["score"]);
@@ -52,172 +53,226 @@ class _MonthlySummaryScreenState extends State<MonthlySummaryScreen> {
   @override
   void dispose() {
     reportController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmall = screenWidth < 360;
+    final isTablet = screenWidth >= 600;
+
+    final double hPadding = isTablet ? 32.0 : (isSmall ? 10.0 : 16.0);
+    final double cardRadius = isTablet ? 24.0 : 18.0;
+    final double avgFontSize = isTablet ? 52.0 : (isSmall ? 34.0 : 42.0);
+    final double avgLabelSize = isTablet ? 24.0 : (isSmall ? 16.0 : 20.0);
+    final double sectionTitleSize = isTablet ? 22.0 : (isSmall ? 15.0 : 18.0);
+    final double studentNameSize = isTablet ? 20.0 : (isSmall ? 15.0 : 18.0);
+    final double avatarRadius = isTablet ? 28.0 : (isSmall ? 20.0 : 24.0);
+    final double progressHeight = isTablet ? 10.0 : 8.0;
+    final double cardVMargin = isTablet ? 10.0 : 8.0;
+    final double cardPadding = isTablet ? 20.0 : (isSmall ? 12.0 : 16.0);
+    final double topCardPaddingV = isTablet ? 28.0 : (isSmall ? 14.0 : 20.0);
+
     return Scaffold(
+      // KEY FIX: let Scaffold resize when keyboard appears
+      resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0xffF4F8FB),
       appBar: AppBar(
-        title: const Text("ملخص التقييم الشهري للحلقة"),
+        title: Text(
+          "ملخص التقييم الشهري للحلقة",
+          style: TextStyle(fontSize: isTablet ? 22 : (isSmall ? 15 : 18)),
+        ),
         centerTitle: true,
         backgroundColor: Colors.blue.shade800,
+        toolbarHeight: isTablet ? 64 : kToolbarHeight,
       ),
-      body: Column(
-        children: [
-          // Average Card
-          Container(
-            width: double.infinity,
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.blue.shade700,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              children: [
-                const Text(
-                  "متوسط تقييم الحلقة",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  averageScore.toStringAsFixed(1),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 42,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Report Input
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                const Text(
-                  "تقرير الحلقة الشهري",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                TextField(
-                  controller: reportController,
-                  maxLines: 5,
-                  textAlign: TextAlign.right,
-                  decoration: InputDecoration(
-                    hintText: " ...اكتب تقريرك الشهري عن مستوى الحلقة هنا",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
+      body: CustomScrollView(
+        controller: _scrollController,
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        slivers: [
+          // ── Average Card ────────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Container(
+              width: double.infinity,
+              margin: EdgeInsets.all(hPadding),
+              padding: EdgeInsets.symmetric(
+                horizontal: hPadding,
+                vertical: topCardPaddingV,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade700,
+                borderRadius: BorderRadius.circular(cardRadius + 2),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    "متوسط تقييم الحلقة",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: avgLabelSize,
                     ),
                   ),
-                ),
-
-                const SizedBox(height: 16),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: sendReport,
-                    icon: const Icon(Icons.send),
-                    label: const Text("إرسال التقرير"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue.shade700,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                  SizedBox(height: isSmall ? 6 : 10),
+                  Text(
+                    averageScore.toStringAsFixed(1),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: avgFontSize,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Students Title
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                "أداء الطلاب خلال الشهر",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ],
               ),
             ),
           ),
 
-          const SizedBox(height: 10),
-
-          // Students List
-          Expanded(
-            child: ListView.builder(
-              itemCount: students.length,
-              itemBuilder: (context, index) {
-                final student = students[index];
-                final int score = student["score"];
-
-                return Container(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+          // ── Report Input ─────────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: hPadding),
+              padding: EdgeInsets.all(cardPadding),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(cardRadius),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    "تقرير الحلقة الشهري",
+                    style: TextStyle(
+                      fontSize: sectionTitleSize,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
                   ),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: getScoreColor(score),
-                            child: Text(
-                              score.toString(),
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              student["name"],
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
+                  SizedBox(height: isSmall ? 8 : 12),
+                  TextField(
+                    controller: reportController,
+                    maxLines: isTablet ? 6 : 5,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(fontSize: isSmall ? 13 : 15),
+                    decoration: InputDecoration(
+                      hintText: " ...اكتب تقريرك الشهري عن مستوى الحلقة هنا",
+                      hintStyle: TextStyle(fontSize: isSmall ? 12 : 14),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      const SizedBox(height: 12),
-                      LinearProgressIndicator(
-                        value: score / 100,
-                        minHeight: 8,
-                        backgroundColor: Colors.grey.shade300,
-                        color: getScoreColor(score),
-                        borderRadius: BorderRadius.circular(20),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: isSmall ? 10 : 14,
+                        vertical: isSmall ? 8 : 12,
                       ),
-                    ],
+                    ),
                   ),
-                );
-              },
+                  SizedBox(height: isSmall ? 10 : 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: sendReport,
+                      icon: Icon(Icons.send, size: isSmall ? 16 : 20),
+                      label: Text(
+                        "إرسال التقرير",
+                        style: TextStyle(fontSize: isSmall ? 13 : 15),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade700,
+                        padding: EdgeInsets.symmetric(
+                          vertical: isSmall ? 10 : 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
+          ),
+
+          SliverToBoxAdapter(child: SizedBox(height: isSmall ? 10 : 16)),
+
+          // ── Section Title ────────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: hPadding),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  "أداء الطلاب خلال الشهر",
+                  style: TextStyle(
+                    fontSize: sectionTitleSize,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          SliverToBoxAdapter(child: SizedBox(height: isSmall ? 6 : 10)),
+
+          // ── Students List ────────────────────────────────────────────
+          SliverList(
+            delegate: SliverChildBuilderDelegate((context, index) {
+              // Add bottom padding after last item
+              final bool isLast = index == students.length - 1;
+              final student = students[index];
+              final int score = student["score"];
+
+              return Container(
+                margin: EdgeInsets.fromLTRB(
+                  hPadding,
+                  cardVMargin,
+                  hPadding,
+                  isLast ? hPadding + cardVMargin : cardVMargin,
+                ),
+                padding: EdgeInsets.all(cardPadding),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(cardRadius),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: avatarRadius,
+                          backgroundColor: getScoreColor(score),
+                          child: Text(
+                            score.toString(),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isSmall ? 11 : (isTablet ? 16 : 13),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: isSmall ? 8 : 12),
+                        Expanded(
+                          child: Text(
+                            student["name"],
+                            style: TextStyle(
+                              fontSize: studentNameSize,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: isSmall ? 8 : 12),
+                    LinearProgressIndicator(
+                      value: score / 100,
+                      minHeight: progressHeight,
+                      backgroundColor: Colors.grey.shade300,
+                      color: getScoreColor(score),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ],
+                ),
+              );
+            }, childCount: students.length),
           ),
         ],
       ),
