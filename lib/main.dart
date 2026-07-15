@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'pages/Teacher/teacher_page.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:quran_app/pages/login_page.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const QuranApp());
 }
 
@@ -13,7 +15,41 @@ class QuranApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Quran App',
-      home: TeacherDashboard(teacherName: 'عبد الرحمان'),
+
+      // ── Arabic / RTL support ──
+      locale: const Locale('ar'),
+      supportedLocales: const [Locale('ar')],
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+
+      // ── Modern Material theme ──
+      theme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: Colors.blue,
+        scaffoldBackgroundColor: const Color(0xfff5f9ff),
+        appBarTheme: const AppBarTheme(elevation: 0, centerTitle: true),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xfff5f9ff),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide.none,
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+        ),
+      ),
+
+      // ── Login Page is the initial screen ──
+      home: const LoginPage(),
     );
   }
 }

@@ -30,8 +30,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  url_launcher: ^6.3.0  
- 
+  flutter_localizations:
+    sdk: flutter
+  url_launcher: ^6.3.0
+  path_provider: ^2.1.6
+  pdf: ^3.6.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -46,6 +49,8 @@ dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  fl_chart: ^1.2.0
+  intl: ^0.20.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -59,6 +64,10 @@ flutter:
   uses-material-design: true
   assets:
      - assets/images/logo.jpg
+     - assets/fonts/NotoSansArabic-Regular.ttf
+     - assets/fonts/NotoSansArabic-Bold.ttf
+     - assets/fonts/DejaVuSans.ttf
+     - assets/fonts/DejaVuSans-Bold.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

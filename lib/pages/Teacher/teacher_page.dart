@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
-import 'screens/student_list_screen.dart';
-import 'screens/daily_evaluation_screen.dart';
-import 'screens/monthly_summary_screen.dart';
-import 'screens/teacher_attendance_screen.dart';
-import 'screens/student_data_screen.dart';
+import 'package:quran_app/pages/Teacher/screens/exam_results_screen.dart';
+import 'package:quran_app/pages/Teacher/screens/student_list_screen.dart';
+import 'package:quran_app/pages/Teacher/screens/daily_evaluation_screen.dart';
+import 'package:quran_app/pages/Teacher/screens/monthly_summary_screen.dart';
+import 'package:quran_app/pages/Teacher/screens/teacher_attendance_screen.dart';
+import 'package:quran_app/pages/Teacher/screens/student_data_screen.dart';
+import 'package:quran_app/pages/Teacher/screens/home_work_screen.dart';
+import 'package:quran_app/pages/login_page.dart';
 
 class TeacherDashboard extends StatelessWidget {
   final String teacherName;
 
   const TeacherDashboard({super.key, required this.teacherName});
+
+  void _logout(BuildContext context) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginPage()),
+      (route) => false,
+    );
+  }
 
   Widget _buildCard({
     required BuildContext context,
@@ -79,160 +89,193 @@ class TeacherDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // Custom AppBar
-      body: Column(
-        children: [
-          Stack(
-            children: [
-              // Enhanced curved gradient background with pattern
-              Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.blueAccent.shade700,
-                      Colors.lightBlueAccent.shade200,
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        // Custom AppBar
+        body: Column(
+          children: [
+            Stack(
+              children: [
+                // Enhanced curved gradient background with pattern
+                Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.blueAccent.shade700,
+                        Colors.lightBlueAccent.shade200,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(50),
+                      bottomRight: Radius.circular(50),
+                    ),
                   ),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(50),
-                    bottomRight: Radius.circular(50),
+                ),
+                // Decorative elements
+                Positioned(
+                  top: 30,
+                  right: 20,
+                  child: Icon(
+                    Icons.school,
+                    color: Colors.white.withValues(alpha: 0.3),
+                    size: 60,
                   ),
                 ),
-              ),
-              // Decorative elements
-              Positioned(
-                top: 20,
-                right: 20,
-                child: Icon(
-                  Icons.school,
-                  color: Colors.white.withValues(alpha: 0.3),
-                  size: 60,
+                Positioned(
+                  top: 100,
+                  left: 20,
+                  child: Icon(
+                    Icons.book,
+                    color: Colors.white.withValues(alpha: 0.2),
+                    size: 40,
+                  ),
                 ),
-              ),
-              Positioned(
-                top: 80,
-                left: 20,
-                child: Icon(
-                  Icons.book,
-                  color: Colors.white.withValues(alpha: 0.2),
-                  size: 40,
+                // Logout button
+                Positioned(
+                  top: 40,
+                  left: 20,
+                  child: Material(
+                    color: Colors.white24,
+                    shape: const CircleBorder(),
+                    child: IconButton(
+                      icon: const Icon(Icons.logout, color: Colors.white),
+                      tooltip: 'تسجيل الخروج',
+                      onPressed: () => _logout(context),
+                    ),
+                  ),
                 ),
-              ),
-              // Teacher info section
-              Positioned(
-                left: 20,
-                bottom: 30,
-                right: 20,
-                child: Row(
-                  children: [
-                    Hero(
-                      tag: 'teacher_avatar',
-                      child: CircleAvatar(
-                        radius: 35,
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          Icons.person,
-                          color: Colors.blueAccent,
-                          size: 40,
+                // Teacher info section
+                Positioned(
+                  left: 20,
+                  bottom: 30,
+                  right: 20,
+                  child: Row(
+                    children: [
+                      Hero(
+                        tag: 'teacher_avatar',
+                        child: CircleAvatar(
+                          radius: 35,
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            Icons.person,
+                            color: Colors.blueAccent,
+                            size: 40,
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 20),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'مرحباً، $teacherName',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black26,
-                                  blurRadius: 4,
-                                  offset: Offset(1, 1),
-                                ),
-                              ],
+                      SizedBox(width: 20),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'مرحباً، $teacherName',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black26,
+                                    blurRadius: 4,
+                                    offset: Offset(1, 1),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'لوحة التحكم الخاصة بك',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.9),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                            SizedBox(height: 4),
+                            Text(
+                              'لوحة التحكم الخاصة بك',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.9),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            // Dashboard Grid with improved layout
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 20,
+                  mainAxisSpacing: 20,
+                  childAspectRatio: 1.1,
+                  children: [
+                    _buildCard(
+                      context: context,
+                      title: 'التقييم اليومي',
+                      icon: Icons.check_circle_rounded,
+                      startColor: Colors.blue.shade600,
+                      endColor: Colors.lightBlueAccent.shade200,
+                      page: DailyEvaluationScreen(),
+                    ),
+                    _buildCard(
+                      context: context,
+                      title: 'حضور وانصراف الطلبة',
+                      icon: Icons.group_rounded,
+                      startColor: Colors.green.shade600,
+                      endColor: Colors.lightGreenAccent.shade200,
+                      page: StudentListScreen(),
+                    ),
+                    _buildCard(
+                      context: context,
+                      title: 'التقييم الشهري',
+                      icon: Icons.calendar_month_rounded,
+                      startColor: Colors.orange.shade600,
+                      endColor: Colors.deepOrangeAccent.shade200,
+                      page: MonthlySummaryScreen(),
+                    ),
+                    _buildCard(
+                      context: context,
+                      title: 'حضور وانصراف المدرس',
+                      icon: Icons.person_rounded,
+                      startColor: Colors.purple.shade600,
+                      endColor: Colors.purpleAccent.shade200,
+                      page: TeacherAttendanceScreen(),
+                    ),
+                    _buildCard(
+                      context: context,
+                      title: 'بيانات الطلاب',
+                      icon: Icons.info_rounded,
+                      startColor: Colors.teal.shade600,
+                      endColor: Colors.cyan.shade200,
+                      page: StudentDataScreen(),
+                    ),
+                    _buildCard(
+                      context: context,
+                      title: 'الواجبات المنزلية',
+                      icon: Icons.assignment_rounded,
+                      startColor: Colors.red.shade600,
+                      endColor: Colors.redAccent.shade200,
+                      page: HomeworkScreen(),
+                    ),
+                    _buildCard(
+                      context: context,
+                      title: 'نتائج الامتحانات',
+                      icon: Icons.bar_chart_rounded,
+                      startColor: Colors.indigo.shade600,
+                      endColor: Colors.indigoAccent.shade200,
+                      page: ExamResultsScreen(),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-          // Dashboard Grid with improved layout
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 20,
-                childAspectRatio: 1.1,
-                children: [
-                  _buildCard(
-                    context: context,
-                    title: 'التقييم اليومي',
-                    icon: Icons.check_circle_rounded,
-                    startColor: Colors.blue.shade600,
-                    endColor: Colors.lightBlueAccent.shade200,
-                    page: DailyEvaluationScreen(),
-                  ),
-                  _buildCard(
-                    context: context,
-                    title: 'حضور وانصراف الطلبة',
-                    icon: Icons.group_rounded,
-                    startColor: Colors.green.shade600,
-                    endColor: Colors.lightGreenAccent.shade200,
-                    page: StudentListScreen(),
-                  ),
-                  _buildCard(
-                    context: context,
-                    title: 'التقييم الشهري',
-                    icon: Icons.calendar_month_rounded,
-                    startColor: Colors.orange.shade600,
-                    endColor: Colors.deepOrangeAccent.shade200,
-                    page: MonthlySummaryScreen(),
-                  ),
-                  _buildCard(
-                    context: context,
-                    title: 'حضور وانصراف المدرس',
-                    icon: Icons.person_rounded,
-                    startColor: Colors.purple.shade600,
-                    endColor: Colors.purpleAccent.shade200,
-                    page: TeacherAttendanceScreen(),
-                  ),
-                  _buildCard(
-                    context: context,
-                    title: 'بيانات الطلاب',
-                    icon: Icons.info_rounded,
-                    startColor: Colors.teal.shade600,
-                    endColor: Colors.cyan.shade200,
-                    page: StudentDataScreen(),
-                  ),
-                ],
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
