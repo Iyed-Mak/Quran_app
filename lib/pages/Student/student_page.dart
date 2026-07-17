@@ -5,6 +5,7 @@ import 'package:quran_app/pages/Student/screens/assessment_results_screen.dart';
 import 'package:quran_app/pages/Student/screens/study_schedule_screen.dart';
 import 'package:quran_app/pages/Student/screens/exam_schedule_screen.dart';
 import 'package:quran_app/pages/Student/screens/announcements_screen.dart';
+import 'package:quran_app/pages/Student/screens/required_files_screen.dart';
 
 import 'package:quran_app/pages/login_page.dart';
 
@@ -292,6 +293,14 @@ class StudentPage extends StatelessWidget {
                               endColor: Colors.pinkAccent.shade200,
                               startColor: Colors.pink.shade600,
                               page: const HomeworkScreen(),
+                            ),
+                            _buildCard(
+                              context: context,
+                              title: 'الملفات المطلوبة',
+                              icon: Icons.folder_open_outlined,
+                              startColor: Colors.blue.shade700,
+                              endColor: Colors.lightBlueAccent.shade200,
+                              page: StudentRequiredFilesScreen(studentName: studentName),
                             ),
                           ],
                         ),

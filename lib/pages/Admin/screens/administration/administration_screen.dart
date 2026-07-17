@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../widgets/dashboard_card.dart';
+import 'fawj_management_screen.dart';
+import 'qaa_management_screen.dart';
+import 'required_files_screen.dart';
 
 class AdministrationScreen extends StatelessWidget {
   const AdministrationScreen({super.key});
@@ -39,6 +42,13 @@ class AdministrationScreen extends StatelessWidget {
       'desc': 'مقرات وفروع المدرسة',
       'start': Color(0xff00695C),
       'end': Color(0xff26A69A),
+    },
+    {
+      'icon': Icons.folder_open,
+      'title': 'الملفات المطلوبة',
+      'desc': 'إدارة الملفات المطلوبة ومتابعة تقديم الطلاب',
+      'start': Color(0xff0277BD),
+      'end': Color(0xff29B6F6),
     },
     {
       'icon': Icons.manage_accounts,
@@ -150,17 +160,34 @@ class AdministrationScreen extends StatelessWidget {
             : 1.02,
       ),
       itemCount: _cards.length,
-      itemBuilder: (_, i) {
-        final c = _cards[i];
-        return DashboardCard(
-          icon: c['icon'] as IconData,
-          title: c['title'] as String,
-          description: c['desc'] as String,
-          gradientStart: c['start'] as Color,
-          gradientEnd: c['end'] as Color,
-          onTap: () {},
-        );
-      },
+            itemBuilder: (_, i) {
+              final c = _cards[i];
+              return DashboardCard(
+                icon: c['icon'] as IconData,
+                title: c['title'] as String,
+                description: c['desc'] as String,
+                gradientStart: c['start'] as Color,
+                gradientEnd: c['end'] as Color,
+                onTap: () {
+                  if (c['title'] == 'إدارة الأفواج') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const FawjManagementScreen()),
+                    );
+                  } else if (c['title'] == 'القاعات الدراسية') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const QaaManagementScreen()),
+                    );
+                  } else if (c['title'] == 'الملفات المطلوبة') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const RequiredFilesScreen()),
+                    );
+                  }
+                },
+              );
+            },
     );
   }
 
