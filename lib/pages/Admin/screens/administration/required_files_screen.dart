@@ -347,50 +347,18 @@ class _RequiredFilesScreenState extends State<RequiredFilesScreen>
       textDirection: ui.TextDirection.rtl,
       child: Scaffold(
         backgroundColor: Colors.grey.shade50,
+        appBar: AppBar(
+          title: const Text('الملفات المطلوبة'),
+          backgroundColor: Colors.blue.shade700,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
         body: Column(
           children: [
-            // ── Header ──
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blue.shade700, Colors.blue.shade400],
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Icon(Icons.folder_open, color: Colors.white, size: 28),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'الملفات المطلوبة',
-                          style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        ),
-                        Text(
-                          'إدارة الملفات المطلوبة ومتابعة حالة الطلاب',
-                          style: TextStyle(color: Colors.white70, fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // ── TabBar ──
             Container(
               color: Colors.white,
               child: TabBar(

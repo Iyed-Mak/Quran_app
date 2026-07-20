@@ -281,54 +281,21 @@ class _QaaManagementScreenState extends State<QaaManagementScreen> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: Colors.grey.shade50,
+        appBar: AppBar(
+          title: const Text('القاعات الدراسية'),
+          backgroundColor: Colors.purple.shade700,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Header ──
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [Colors.purple.shade700, Colors.purple.shade400]),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Icon(Icons.meeting_room, color: Colors.white, size: 28),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'القاعات الدراسية',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.purple),
-                        ),
-                        Text(
-                          'إدارة القاعات والطاقة الاستيعابية',
-                          style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.add),
-                    label: const Text('إضافة قاعة'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple.shade700,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    ),
-                    onPressed: _showAddQaaDialog,
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              // ── Search Bar ──
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(

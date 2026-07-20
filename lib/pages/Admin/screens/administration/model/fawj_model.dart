@@ -4,6 +4,7 @@
 class Fawj {
   final int id;
   final String name; // اسم الفوج (مثل: فوج 1، فوج 2)
+  final bool isFemale; // true = نساء, false = رجال
   final String? teacherName; // اسم الأستاذ المعين
   final int studentsCount; // عدد الطلاب في الفوج
   final List<String> studentNames; // أسماء الطلاب
@@ -12,6 +13,7 @@ class Fawj {
   const Fawj({
     required this.id,
     required this.name,
+    this.isFemale = false,
     this.teacherName,
     required this.studentsCount,
     required this.studentNames,
@@ -22,6 +24,7 @@ class Fawj {
   Fawj copyWith({
     int? id,
     String? name,
+    bool? isFemale,
     String? teacherName,
     int? studentsCount,
     List<String>? studentNames,
@@ -30,6 +33,7 @@ class Fawj {
     return Fawj(
       id: id ?? this.id,
       name: name ?? this.name,
+      isFemale: isFemale ?? this.isFemale,
       teacherName: teacherName ?? this.teacherName,
       studentsCount: studentsCount ?? this.studentsCount,
       studentNames: studentNames ?? this.studentNames,
@@ -38,7 +42,7 @@ class Fawj {
   }
 
   @override
-  String toString() => 'Fawj(id: $id, name: $name, teacher: $teacherName, students: $studentsCount)';
+  String toString() => 'Fawj(id: $id, name: $name, female: $isFemale, teacher: $teacherName, students: $studentsCount)';
 
   @override
   bool operator ==(Object other) =>
@@ -55,55 +59,58 @@ class FawjMockData {
         Fawj(
           id: 1,
           name: 'فوج 1',
+          isFemale: false,
           teacherName: 'الأستاذ أحمد',
           studentsCount: 15,
           studentNames: [
             'أحمد محمد',
-            'محمد علي',
-            'ليلى أحمد',
-            'فاطمة حسن',
             'خالد عمر',
-            'مريم عبد الله',
             'يوسف إبراهيم',
-            'زينب علي',
             'عمر خالد',
-            'سارة أحمد',
             'حسين محمد',
-            'نور الدين',
-            'إيمان سعيد',
             'عبد الرحمن',
-            'آية جمال',
+            'محمد علي',
+            'أنس الهاشمي',
+            'حمزة بن صالح',
+            'عبد الله مولاي',
+            'نور الدين',
+            'أمين بن يوسف',
+            'زياد خالد',
+            'راشد بن عمر',
+            'مصطفى أمين',
           ],
-          description: 'فوج المستوى الأول - حفظ القرآن',
+          description: 'فوج الرجال الأول - حفظ القرآن',
         ),
         Fawj(
           id: 2,
-          name: 'فوج 2',
-          teacherName: 'الأستاذ محمد',
+          name: 'فوج 1',
+          isFemale: true,
+          teacherName: 'الأستاذة سارة',
           studentsCount: 12,
           studentNames: [
             'سارة أحمد',
-            'حسين محمد',
+            'فاطمة حسن',
+            'مريم عبد الله',
+            'زينب علي',
+            'ليلى أحمد',
             'نور الدين',
             'إيمان سعيد',
-            'عبد الرحمن علي',
             'آية جمال',
-            'زينب حسن',
-            'عمر خالد',
-            'ليلى أحمد',
-            'فاطمة محمد',
-            'مريم عمر',
-            'يوسف إبراهيم',
+            'أمينة بوعلام',
+            'حليمة بن سعيد',
+            'نور الإيمان',
+            'فاطمة الزهراء',
           ],
-          description: 'فوج المستوى الثاني - تجويد',
+          description: 'فوج النساء الأول - تجويد',
         ),
         Fawj(
           id: 3,
-          name: 'فوج 3',
+          name: 'فوج 2',
+          isFemale: false,
           teacherName: null,
           studentsCount: 0,
           studentNames: [],
-          description: 'فوج جديد - لم يتم تعيين أستاذ بعد',
+          description: 'فوج رجال جديد - لم يتم تعيين أستاذ بعد',
         ),
       ];
 }

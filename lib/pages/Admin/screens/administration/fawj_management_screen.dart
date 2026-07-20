@@ -9,17 +9,19 @@ class FawjManagementScreen extends StatefulWidget {
   State<FawjManagementScreen> createState() => _FawjManagementScreenState();
 }
 
+enum _GenderFilter { all, male, female }
+
 class _FawjManagementScreenState extends State<FawjManagementScreen> {
   late List<Fawj> _fawjs;
-  int _nextId = 4; // للـ ID التلقائي
+  int _nextId = 4;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  _GenderFilter _genderFilter = _GenderFilter.all;
 
   @override
   void initState() {
     super.initState();
     _fawjs = List.from(FawjMockData.initialFawjs);
-    // تحديث nextId بناءً على البيانات الموجودة
     if (_fawjs.isNotEmpty) {
       _nextId = _fawjs.map((f) => f.id).reduce((a, b) => a > b ? a : b) + 1;
     }
@@ -31,19 +33,47 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
     super.dispose();
   }
 
+  // الحصول على أعلى رقم ترقيم لفئة جنس معينة
+  int _nextNumberForGender(bool isFemale) {
+    int maxNum = 0;
+    for (final f in _fawjs.where((f) => f.isFemale == isFemale)) {
+      final match = RegExp(r'(\d+)').firstMatch(f.name);
+      if (match != null) {
+        final num = int.parse(match.group(1)!);
+        if (num > maxNum) maxNum = num;
+      }
+    }
+    return maxNum + 1;
+  }
+
+  String _autoName(bool isFemale) {
+    final num = _nextNumberForGender(isFemale);
+    return 'فوج $num';
+  }
+
   List<Fawj> get _filteredFawjs {
-    if (_searchQuery.isEmpty) return _fawjs;
-    return _fawjs.where((f) =>
-      f.name.contains(_searchQuery) ||
-      (f.teacherName?.contains(_searchQuery) ?? false) ||
-      f.studentNames.any((s) => s.contains(_searchQuery)) ||
-      (f.description?.contains(_searchQuery) ?? false)
-    ).toList();
+    List<Fawj> result = _fawjs;
+    // تطبيق فلتر الجنس
+    if (_genderFilter == _GenderFilter.male) {
+      result = result.where((f) => !f.isFemale).toList();
+    } else if (_genderFilter == _GenderFilter.female) {
+      result = result.where((f) => f.isFemale).toList();
+    }
+    // تطبيق البحث
+    if (_searchQuery.isNotEmpty) {
+      result = result.where((f) =>
+        f.name.contains(_searchQuery) ||
+        (f.teacherName?.contains(_searchQuery) ?? false) ||
+        f.studentNames.any((s) => s.contains(_searchQuery)) ||
+        (f.description?.contains(_searchQuery) ?? false)
+      ).toList();
+    }
+    return result;
   }
 
   // ── إضافة فوج جديد ──
   void _showAddFawjDialog() {
-    final nameController = TextEditingController();
+    bool isFemale = false;
     final teacherController = TextEditingController();
     final studentsCountController = TextEditingController();
     final descriptionController = TextEditingController();
@@ -61,9 +91,57 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildTextField(nameController, 'اسم الفوج *', 'مثال: فوج 1', Icons.group),
+                  // الاسم التلقائي + اختيار الجنس
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.blue.shade100),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.auto_awesome, color: Colors.blue.shade700, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          _autoName(isFemale),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue.shade800,
+                          ),
+                        ),
+                        const Spacer(),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 12),
-                  _buildTextField(teacherController, 'اسم الأستاذ', 'مثال: الأستاذ أحمد', Icons.person),
+                  // اختيار الجنس
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _genderChip(
+                          label: 'رجال',
+                          icon: Icons.male,
+                          selected: !isFemale,
+                          color: Colors.blue,
+                          onTap: () => setDialogState(() => isFemale = false),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _genderChip(
+                          label: 'نساء',
+                          icon: Icons.female,
+                          selected: isFemale,
+                          color: Colors.pink,
+                          onTap: () => setDialogState(() => isFemale = true),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _buildTextField(teacherController, 'اسم الأستاذ/الأستاذة', 'مثال: الأستاذ أحمد', Icons.person),
                   const SizedBox(height: 12),
                   _buildTextField(studentsCountController, 'عدد الطلاب', 'مثال: 15', Icons.people, keyboardType: TextInputType.number),
                   const SizedBox(height: 12),
@@ -75,7 +153,7 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
                       Expanded(
                         child: _buildTextField(
                           studentNameController,
-                          'اسم الطالب',
+                          'اسم الطالب/الطالبة',
                           'أضف طالباً واحداً تلو الآخر',
                           Icons.person_add,
                         ),
@@ -103,7 +181,7 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
                         label: Text(name),
                         deleteIcon: const Icon(Icons.close, size: 16),
                         onDeleted: () => setDialogState(() => studentNames.remove(name)),
-                        backgroundColor: Colors.blue.shade50,
+                        backgroundColor: isFemale ? Colors.pink.shade50 : Colors.blue.shade50,
                       )).toList(),
                     ),
                   ],
@@ -119,17 +197,16 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
             ElevatedButton.icon(
               icon: const Icon(Icons.save),
               label: const Text('حفظ الفوج'),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue.shade700, foregroundColor: Colors.white),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isFemale ? Colors.pink.shade700 : Colors.blue.shade700,
+                foregroundColor: Colors.white,
+              ),
               onPressed: () {
-                if (nameController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    const SnackBar(content: Text('يرجى إدخال اسم الفوج'), backgroundColor: Colors.red),
-                  );
-                  return;
-                }
+                final name = _autoName(isFemale);
                 final newFawj = Fawj(
                   id: _nextId++,
-                  name: nameController.text.trim(),
+                  name: name,
+                  isFemale: isFemale,
                   teacherName: teacherController.text.trim().isEmpty ? null : teacherController.text.trim(),
                   studentsCount: int.tryParse(studentsCountController.text.trim()) ?? studentNames.length,
                   studentNames: studentNames,
@@ -148,14 +225,51 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
     );
   }
 
+  Widget _genderChip({
+    required String label,
+    required IconData icon,
+    required bool selected,
+    required MaterialColor color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: selected ? color.shade50 : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected ? color.shade400 : Colors.grey.shade300,
+            width: selected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: selected ? color.shade700 : Colors.grey, size: 22),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: selected ? color.shade800 : Colors.grey.shade600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ── تعديل فوج موجود ──
   void _showEditFawjDialog(Fawj fawj) {
-    final nameController = TextEditingController(text: fawj.name);
     final teacherController = TextEditingController(text: fawj.teacherName ?? '');
     final studentsCountController = TextEditingController(text: fawj.studentsCount.toString());
     final descriptionController = TextEditingController(text: fawj.description ?? '');
     final List<String> studentNames = List.from(fawj.studentNames);
     final studentNameController = TextEditingController();
+    bool isFemale = fawj.isFemale;
 
     showDialog(
       context: context,
@@ -168,21 +282,63 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildTextField(nameController, 'اسم الفوج *', 'مثال: فوج 1', Icons.group),
+                  // اسم الفوج + الجنس
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: (isFemale ? Colors.pink : Colors.blue).shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: (isFemale ? Colors.pink : Colors.blue).shade100),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(isFemale ? Icons.female : Icons.male,
+                            color: (isFemale ? Colors.pink : Colors.blue).shade700, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          fawj.name,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: (isFemale ? Colors.pink : Colors.blue).shade800,
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.7),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<bool>(
+                              value: isFemale,
+                              items: const [
+                                DropdownMenuItem(value: false, child: Text('رجال', style: TextStyle(fontSize: 13))),
+                                DropdownMenuItem(value: true, child: Text('نساء', style: TextStyle(fontSize: 13))),
+                              ],
+                              onChanged: (v) {
+                                if (v != null) setDialogState(() => isFemale = v);
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 12),
-                  _buildTextField(teacherController, 'اسم الأستاذ', 'مثال: الأستاذ أحمد', Icons.person),
+                  _buildTextField(teacherController, 'اسم الأستاذ/الأستاذة', 'مثال: الأستاذ أحمد', Icons.person),
                   const SizedBox(height: 12),
                   _buildTextField(studentsCountController, 'عدد الطلاب', 'مثال: 15', Icons.people, keyboardType: TextInputType.number),
                   const SizedBox(height: 12),
                   _buildTextField(descriptionController, 'وصف / ملاحظات', 'مثال: فوج المستوى الأول', Icons.description),
                   const SizedBox(height: 16),
-                  // قسم إدارة الطلاب
                   Row(
                     children: [
                       Expanded(
                         child: _buildTextField(
                           studentNameController,
-                          'اسم الطالب',
+                          'اسم الطالب/الطالبة',
                           'أضف طالباً واحداً تلو الآخر',
                           Icons.person_add,
                         ),
@@ -210,7 +366,7 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
                         label: Text(name),
                         deleteIcon: const Icon(Icons.close, size: 16),
                         onDeleted: () => setDialogState(() => studentNames.remove(name)),
-                        backgroundColor: Colors.blue.shade50,
+                        backgroundColor: (isFemale ? Colors.pink : Colors.blue).shade50,
                       )).toList(),
                     ),
                   ],
@@ -226,16 +382,13 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
             ElevatedButton.icon(
               icon: const Icon(Icons.save),
               label: const Text('حفظ التعديلات'),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.orange.shade700, foregroundColor: Colors.white),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange.shade700,
+                foregroundColor: Colors.white,
+              ),
               onPressed: () {
-                if (nameController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(dialogContext).showSnackBar(
-                    const SnackBar(content: Text('يرجى إدخال اسم الفوج'), backgroundColor: Colors.red),
-                  );
-                  return;
-                }
                 final updatedFawj = fawj.copyWith(
-                  name: nameController.text.trim(),
+                  isFemale: isFemale,
                   teacherName: teacherController.text.trim().isEmpty ? null : teacherController.text.trim(),
                   studentsCount: int.tryParse(studentsCountController.text.trim()) ?? studentNames.length,
                   studentNames: studentNames,
@@ -300,6 +453,7 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _detailRow('اسم الفوج', fawj.name, Icons.group),
+                _detailRow('الجنس', fawj.isFemale ? 'نساء' : 'رجال', fawj.isFemale ? Icons.female : Icons.male),
                 _detailRow('الأستاذ', fawj.teacherName ?? 'غير معين', Icons.person),
                 _detailRow('عدد الطلاب', '${fawj.studentsCount}', Icons.people),
                 _detailRow('الوصف', fawj.description ?? 'لا يوجد', Icons.description),
@@ -314,7 +468,7 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
                     runSpacing: 8,
                     children: fawj.studentNames.map((name) => Chip(
                       label: Text(name),
-                      backgroundColor: Colors.blue.shade50,
+                      backgroundColor: (fawj.isFemale ? Colors.pink : Colors.blue).shade50,
                     )).toList(),
                   ),
               ],
@@ -376,52 +530,72 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: Colors.grey.shade50,
+        appBar: AppBar(
+          title: const Text('إدارة الأفواج'),
+          backgroundColor: Colors.blue.shade700,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Header ──
+              // ── Action Bar ──
               Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [Colors.orange.shade700, Colors.orange.shade400]),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Icon(Icons.group_work, color: Colors.white, size: 28),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'إدارة الأفواج',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.orange),
-                        ),
-                        Text(
-                          'إنشاء الأفواج، تعيين الأساتذة، وإدارة الطلاب',
-                          style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-                        ),
-                      ],
-                    ),
-                  ),
                   ElevatedButton.icon(
                     icon: const Icon(Icons.add),
                     label: const Text('إضافة فوج'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange.shade700,
+                      backgroundColor: Colors.blue.shade700,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     ),
                     onPressed: _showAddFawjDialog,
                   ),
+                  const Spacer(),
+                  Text(
+                    '${_filteredFawjs.length} / ${_fawjs.length}',
+                    style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w600),
+                  ),
                 ],
               ),
+              const SizedBox(height: 16),
 
-              const SizedBox(height: 24),
+              // ── Gender Filter Chips ──
+              Row(
+                children: [
+                  _filterChip(
+                    label: 'الكل',
+                    selected: _genderFilter == _GenderFilter.all,
+                    color: Colors.grey,
+                    onTap: () => setState(() => _genderFilter = _GenderFilter.all),
+                  ),
+                  const SizedBox(width: 8),
+                  _filterChip(
+                    label: 'رجال ${_fawjs.where((f) => !f.isFemale).length}',
+                    icon: Icons.male,
+                    selected: _genderFilter == _GenderFilter.male,
+                    color: Colors.blue,
+                    onTap: () => setState(() => _genderFilter = _GenderFilter.male),
+                  ),
+                  const SizedBox(width: 8),
+                  _filterChip(
+                    label: 'نساء ${_fawjs.where((f) => f.isFemale).length}',
+                    icon: Icons.female,
+                    selected: _genderFilter == _GenderFilter.female,
+                    color: Colors.pink,
+                    onTap: () => setState(() => _genderFilter = _GenderFilter.female),
+                  ),
+                  const Spacer(),
+                ],
+              ),
+              const SizedBox(height: 16),
 
               // ── Search Bar ──
               Container(
@@ -453,10 +627,6 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
                           setState(() => _searchQuery = '');
                         },
                       ),
-                    Text(
-                      '${_filteredFawjs.length} / ${_fawjs.length}',
-                      style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w500),
-                    ),
                   ],
                 ),
               ),
@@ -475,7 +645,8 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
                   child: Center(
                     child: Column(
                       children: [
-                        Icon(Icons.group_work, size: 64, color: Colors.grey.shade300),
+                        Icon(_genderFilter == _GenderFilter.female ? Icons.female : Icons.group_work,
+                            size: 64, color: Colors.grey.shade300),
                         const SizedBox(height: 16),
                         Text(
                           _searchQuery.isEmpty ? 'لا توجد أفواج بعد' : 'لا توجد نتائج للبحث',
@@ -520,6 +691,47 @@ class _FawjManagementScreenState extends State<FawjManagementScreen> {
   }
 }
 
+// ── فلتر الجنس (Chip) ──
+Widget _filterChip({
+  required String label,
+  IconData? icon,
+  required bool selected,
+  required MaterialColor color,
+  required VoidCallback onTap,
+}) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: selected ? color.shade50 : Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: selected ? color.shade400 : Colors.grey.shade300,
+          width: selected ? 2 : 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 16, color: selected ? color.shade700 : Colors.grey),
+            const SizedBox(width: 6),
+          ],
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: selected ? color.shade800 : Colors.grey.shade600,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 // ── بطاقة الفوج ──
 class _FawjCard extends StatelessWidget {
   final Fawj fawj;
@@ -534,6 +746,9 @@ class _FawjCard extends StatelessWidget {
     required this.onView,
   });
 
+  MaterialColor get _accent => fawj.isFemale ? Colors.pink : Colors.blue;
+  Color get _accentLight => fawj.isFemale ? Colors.pink.shade50 : Colors.blue.shade50;
+
   @override
   Widget build(BuildContext context) {
     final hasTeacher = fawj.teacherName != null && fawj.teacherName!.isNotEmpty;
@@ -544,9 +759,9 @@ class _FawjCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
-          BoxShadow(color: Colors.orange.shade50, blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: _accentLight, blurRadius: 10, offset: const Offset(0, 4)),
         ],
-        border: Border.all(color: Colors.orange.shade100),
+        border: Border.all(color: _accent.shade100),
       ),
       child: Column(
         children: [
@@ -556,7 +771,9 @@ class _FawjCard extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: hasTeacher ? [Colors.orange.shade600, Colors.orange.shade400] : [Colors.grey.shade400, Colors.grey.shade300],
+                colors: hasTeacher
+                    ? [_accent.shade600, _accent.shade400]
+                    : [Colors.grey.shade400, Colors.grey.shade300],
               ),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
             ),
@@ -565,11 +782,10 @@ class _FawjCard extends StatelessWidget {
                 CircleAvatar(
                   radius: 22,
                   backgroundColor: Colors.white.withValues(alpha: 0.2),
-                  child: Text(
-                    fawj.name.replaceAll(RegExp(r'[^0-9]'), '').isEmpty
-                        ? 'ف'
-                        : fawj.name.replaceAll(RegExp(r'[^0-9]'), ''),
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                  child: Icon(
+                    fawj.isFemale ? Icons.female : Icons.male,
+                    color: Colors.white,
+                    size: 22,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -585,6 +801,10 @@ class _FawjCard extends StatelessWidget {
                           fontSize: 16,
                         ),
                         overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        fawj.isFemale ? 'نساء' : 'رجال',
+                        style: const TextStyle(color: Colors.white70, fontSize: 11),
                       ),
                       if (hasTeacher)
                         Text(
@@ -611,17 +831,17 @@ class _FawjCard extends StatelessWidget {
                   // عدد الطلاب
                   Row(
                     children: [
-                      Icon(Icons.people, size: 18, color: Colors.orange.shade700),
+                      Icon(Icons.people, size: 18, color: _accent.shade700),
                       const SizedBox(width: 8),
                       Text(
                         'الطلاب: ${fawj.studentsCount}',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.orange.shade800),
+                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: _accent.shade800),
                       ),
                       const Spacer(),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: hasStudents ? Colors.green.shade50 : Colors.orange.shade50,
+                          color: hasStudents ? Colors.green.shade50 : _accent.shade50,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -629,7 +849,7 @@ class _FawjCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: hasStudents ? Colors.green.shade700 : Colors.orange.shade700,
+                            color: hasStudents ? Colors.green.shade700 : _accent.shade700,
                           ),
                         ),
                       ),
@@ -648,7 +868,7 @@ class _FawjCard extends StatelessWidget {
                       children: fawj.studentNames.take(3).map((name) => Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: Colors.blue.shade50,
+                          color: _accentLight,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(name, style: const TextStyle(fontSize: 11)),

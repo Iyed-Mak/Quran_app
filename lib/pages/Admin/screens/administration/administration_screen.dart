@@ -3,6 +3,7 @@ import '../../widgets/dashboard_card.dart';
 import 'fawj_management_screen.dart';
 import 'qaa_management_screen.dart';
 import 'required_files_screen.dart';
+import 'maqarr_management_screen.dart';
 
 class AdministrationScreen extends StatelessWidget {
   const AdministrationScreen({super.key});
@@ -183,6 +184,11 @@ class AdministrationScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const RequiredFilesScreen()),
+                    );
+                  } else if (c['title'] == 'المقرات') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const MaqarrManagementScreen()),
                     );
                   }
                 },
