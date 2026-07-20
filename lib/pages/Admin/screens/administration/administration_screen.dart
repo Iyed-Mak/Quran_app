@@ -10,13 +10,6 @@ class AdministrationScreen extends StatelessWidget {
 
   static const _cards = [
     {
-      'icon': Icons.settings,
-      'title': 'إعدادات المدرسة',
-      'desc': 'اسم المدرسة، الشعار، بيانات الاتصال',
-      'start': Color(0xff1565C0),
-      'end': Color(0xff42A5F5),
-    },
-    {
       'icon': Icons.calendar_today,
       'title': 'السنة الدراسية',
       'desc': 'إدارة الفصول الدراسية والتواريخ',
@@ -31,13 +24,6 @@ class AdministrationScreen extends StatelessWidget {
       'end': Color(0xffFFA726),
     },
     {
-      'icon': Icons.meeting_room,
-      'title': 'القاعات الدراسية',
-      'desc': 'إدارة القاعات والطاقة الاستيعابية',
-      'start': Color(0xff6A1B9A),
-      'end': Color(0xffAB47BC),
-    },
-    {
       'icon': Icons.location_city,
       'title': 'المقرات',
       'desc': 'مقرات وفروع المدرسة',
@@ -50,34 +36,6 @@ class AdministrationScreen extends StatelessWidget {
       'desc': 'إدارة الملفات المطلوبة ومتابعة تقديم الطلاب',
       'start': Color(0xff0277BD),
       'end': Color(0xff29B6F6),
-    },
-    {
-      'icon': Icons.manage_accounts,
-      'title': 'حسابات المستخدمين',
-      'desc': 'إدارة المستخدمين وكلمات المرور',
-      'start': Color(0xffB71C1C),
-      'end': Color(0xffEF5350),
-    },
-    {
-      'icon': Icons.security,
-      'title': 'الأدوار والصلاحيات',
-      'desc': 'تعيين الأدوار وضبط الصلاحيات',
-      'start': Color(0xff37474F),
-      'end': Color(0xff78909C),
-    },
-    {
-      'icon': Icons.summarize,
-      'title': 'التقارير',
-      'desc': 'تقارير شاملة قابلة للتصدير',
-      'start': Color(0xff0277BD),
-      'end': Color(0xff29B6F6),
-    },
-    {
-      'icon': Icons.archive,
-      'title': 'الأرشيف',
-      'desc': 'أرشفة البيانات والسنوات السابقة',
-      'start': Color(0xff4E342E),
-      'end': Color(0xff8D6E63),
     },
   ];
 
